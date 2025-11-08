@@ -1,5 +1,5 @@
 
-# JDownloader2 AppImage
+# Unofficial JDownloader2 AppImage
 
 This repository builds a portable AppImage of JDownloader2 for Linux.
 Official site: https://jdownloader.org
@@ -12,14 +12,16 @@ The script uses `quick-sharun.sh` to simplify AppImage creation.
 2. Make the file executable:
 
 	right click > Properties > Allow executing file as a program
-	or
+
+	or:
 	```bash
 	chmod +x JDownloader2-*.AppImage
 	```
 3. Run it:
 
 	double click
-	or
+
+	or:
 	```bash
 	./JDownloader2-*.AppImage
 	```
