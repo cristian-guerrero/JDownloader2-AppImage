@@ -19,12 +19,28 @@ fi
 DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 PERSIST_DIR="${JD2_APPIMAGE_DATA_DIR:-$DATA_HOME/JDownloader2-AppImage}"
 STAMP_FILE="${PERSIST_DIR}/.appimage-source"
-CURRENT_STAMP="${APPIMAGE:-$BUNDLE_ROOT}"
+STAMP_SOURCE="${BUNDLE_JD}/JDownloader2"
+if command -v sha256sum >/dev/null 2>&1 && [ -r "$STAMP_SOURCE" ]; then
+  CURRENT_STAMP=$(sha256sum "$STAMP_SOURCE" | awk '{print $1}')
+else
+  CURRENT_STAMP="${APPIMAGE:-$BUNDLE_ROOT}"
+fi
+CURRENT_STAMP="${CURRENT_STAMP:-${APPIMAGE:-$BUNDLE_ROOT}}"
 
 mkdir -p "$PERSIST_DIR"
 
-if [ ! -e "$STAMP_FILE" ]; then
-  printf 'Initialisation du profil JDownloader dans %s\n' "$PERSIST_DIR" >&2
+PREVIOUS_STAMP=""
+if [ -f "$STAMP_FILE" ]; then
+  PREVIOUS_STAMP=$(cat "$STAMP_FILE" 2>/dev/null || printf '')
+fi
+
+if [ "$PREVIOUS_STAMP" != "$CURRENT_STAMP" ]; then
+  if [ -n "$PREVIOUS_STAMP" ]; then
+    printf 'Mise à jour du profil JDownloader dans %s\n' "$PERSIST_DIR" >&2
+  else
+    printf 'Initialisation du profil JDownloader dans %s\n' "$PERSIST_DIR" >&2
+  fi
+
   if command -v rsync >/dev/null 2>&1; then
     rsync -a --no-perms --no-owner --no-group "${BUNDLE_JD}/" "$PERSIST_DIR/"
   else
