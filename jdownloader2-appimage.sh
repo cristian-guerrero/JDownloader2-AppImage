@@ -18,6 +18,30 @@ mkdir -p jd2
 wget -O JD2Setup_x64.sh https://installer.jdownloader.org/JD2Setup_x64.sh
 INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash JD2Setup_x64.sh -q -dir "${PWD}/jd2"
 
+# Patch du lanceur install4j pour supporter les JVM récentes (>= 9)
+python3 - <<'PY'
+from pathlib import Path
+
+launcher = Path("jd2/JDownloader2")
+text = launcher.read_text()
+needle = """  if [ "$ver_major" -gt "2" ]; then\n    return;\n  elif [ "$ver_major" -eq "2" ]; then\n    if [ "$ver_minor" -gt "0" ]; then\n      return;\n    fi\n  fi"""
+replacement = """  if [ "$ver_major" -gt "2" ]; then\n    if [ "$ver_major" -lt "9" ]; then\n      return;\n    fi\n  elif [ "$ver_major" -eq "2" ]; then\n    if [ "$ver_minor" -gt "0" ]; then\n      return;\n    fi\n  fi"""
+
+if needle not in text:
+	raise SystemExit("Erreur : Impossible de patcher JDownloader2, bloc de version introuvable.")
+
+patched = text.replace(needle, replacement)
+patched = patched.replace(
+	"  echo The version of the JVM must be at least 1.6 and at most 2.0.\n",
+	'  echo "The version of the JVM must be at least 1.6."\n  echo "Modern JVM releases (9+) are supported in this AppImage build."\n',
+)
+patched = patched.replace(
+	"  echo The version of the JVM must be at least 1.6.\n  echo Modern JVM releases (9+) are supported in this AppImage build.\n",
+	'  echo "The version of the JVM must be at least 1.6."\n  echo "Modern JVM releases (9+) are supported in this AppImage build."\n',
+)
+launcher.write_text(patched)
+PY
+
 # Préparation AppDir
 mkdir -p AppDir/bin AppDir/jd2
 cp jd2/JDownloader2 AppDir/jd2/JDownloader2
