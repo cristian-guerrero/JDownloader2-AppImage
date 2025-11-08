@@ -95,6 +95,13 @@ cp "jd2/.install4j/JDownloader2.png" AppDir/.DirIcon
 cp bin/JDownloader2 AppDir/bin/JDownloader2
 # S'assurer que le lanceur est exécutable
 chmod +x AppDir/bin/JDownloader2
+# Récupérer l'AppRun générique fourni par quick-sharun
+wget -O AppDir/AppRun https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/bin/AppRun-generic
+sed -i \
+	-e "s|@MAIN_BIN@|JDownloader2|" \
+	-e "s|@APPIMAGE_ARCH@|$ARCH|" \
+	AppDir/AppRun
+chmod +x AppDir/AppRun
 
 # Construction AppImage
 wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/quick-sharun.sh
