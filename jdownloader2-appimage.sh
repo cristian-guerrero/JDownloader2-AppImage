@@ -20,6 +20,8 @@ cp -r jd2/* AppDir/jd2/
 cp "jd2/JDownloader 2.desktop" AppDir/JDownloader2.desktop
 cp "jd2/.install4j/JDownloader2.png" AppDir/.DirIcon
 cp bin/JDownloader2 AppDir/bin/JDownloader2
+# S'assurer que le lanceur est exécutable
+chmod +x AppDir/bin/JDownloader2
 
 # Construction AppImage
 wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/quick-sharun.sh
