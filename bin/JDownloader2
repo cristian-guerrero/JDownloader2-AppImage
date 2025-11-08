@@ -53,44 +53,8 @@ printf '%s\n' "$CURRENT_STAMP" > "$STAMP_FILE"
 export JAVA_HOME="$BUNDLE_ROOT/jd2/jre"
 export INSTALL4J_JAVA_HOME="$BUNDLE_ROOT/jd2/jre"
 
-adjust_nofile_limit() {
-  target=1048576
-
-  # dash busybox n'acceptent pas tous l'option -Sn ; on tente plusieurs syntaxes.
-  soft_limit=$(ulimit -Sn 2>/dev/null || ulimit -n 2>/dev/null || printf '')
-  hard_limit=$(ulimit -Hn 2>/dev/null || printf '')
-
-  needs_adjustment=false
-
-  case "$soft_limit" in
-    '' ) return ;;
-    unlimited | infinity )
-      needs_adjustment=true
-      ;;
-    * )
-      if printf '%s\n' "$soft_limit" | grep -Eq '^[0-9]+' && [ "$soft_limit" -gt "$target" ]; then
-        needs_adjustment=true
-      fi
-      ;;
-  esac
-
-  if [ "$needs_adjustment" = true ]; then
-    new_limit=$target
-    if [ "$hard_limit" = "unlimited" ] || [ "$hard_limit" = "infinity" ]; then
-      :
-    elif printf '%s\n' "$hard_limit" | grep -Eq '^[0-9]+'; then
-      if [ "$hard_limit" -lt "$new_limit" ]; then
-        new_limit=$hard_limit
-      fi
-    fi
-
-    # Fixe d'abord la hard limit si possible, puis la soft limit.
-    ulimit -H -n "$new_limit" 2>/dev/null || true
-    ulimit -S -n "$new_limit" 2>/dev/null || ulimit -n "$new_limit" 2>/dev/null || true
-  fi
-}
-
-adjust_nofile_limit
+# Cap the open-file limit to a sane value to avoid glibc crashes with "unlimited".
+ulimit -n 1048576 2>/dev/null || true
 
 cd "$PERSIST_DIR"
 exec "$PERSIST_DIR/JDownloader2" "$@"
