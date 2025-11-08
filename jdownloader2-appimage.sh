@@ -35,7 +35,21 @@ client.download_url(
 	dest_path=str(target_dir)
 )
 PY
-INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash jd2/JDownloader2Setup_unix_nojre.sh -q -dir "${PWD}/jd2"
+INSTALL_DIR="${PWD}/jd2/install"
+INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash jd2/JDownloader2Setup_unix_nojre.sh -q -dir "$INSTALL_DIR"
+
+# Déplacer l'installation effective dans jd2/ sans conserver de dossier avec espaces
+if [ -d "jd2/install" ]; then
+	if [ -d "jd2/install/JDownloader 2" ]; then
+		src_dir="jd2/install/JDownloader 2"
+	elif [ -d "jd2/install/JDownloader2" ]; then
+		src_dir="jd2/install/JDownloader2"
+	else
+		src_dir="jd2/install"
+	fi
+	cp -a "$src_dir"/. jd2/
+	rm -rf jd2/install
+fi
 
 # Préparation AppDir
 mkdir -p AppDir/bin AppDir/jd2
