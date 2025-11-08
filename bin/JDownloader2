@@ -25,7 +25,11 @@ mkdir -p "$PERSIST_DIR"
 
 if [ ! -e "$STAMP_FILE" ]; then
   printf 'Initialisation du profil JDownloader dans %s\n' "$PERSIST_DIR" >&2
-  cp -a "${BUNDLE_JD}/." "$PERSIST_DIR/"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --no-perms --no-owner --no-group "${BUNDLE_JD}/" "$PERSIST_DIR/"
+  else
+    cp -r "${BUNDLE_JD}/." "$PERSIST_DIR/"
+  fi
 fi
 
 printf '%s\n' "$CURRENT_STAMP" > "$STAMP_FILE"
