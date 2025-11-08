@@ -19,22 +19,27 @@ INSTALLER_PATH="${PWD}/JDownloader2Setup_unix_nojre.sh"
 if [ ! -x "$INSTALLER_PATH" ]; then
 	chmod +x "$INSTALLER_PATH"
 fi
-INSTALL_DIR="${PWD}/jd2/install"
+INSTALL_WORKDIR="${PWD}/jd2/install"
+INSTALL_DIR="${INSTALL_WORKDIR}/target"
+rm -rf "$INSTALL_WORKDIR"
 mkdir -p "$INSTALL_DIR"
-INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash "$INSTALLER_PATH" -q -dir "$INSTALL_DIR"
+INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash "$INSTALLER_PATH" -q -overwrite -dir "$INSTALL_DIR" -var sys.installationDir="$INSTALL_DIR"
 
 # Déplacer l'installation effective dans jd2/ sans conserver de dossier avec espaces
-if [ -d "jd2/install" ]; then
-	if [ -d "jd2/install/JDownloader 2" ]; then
-		src_dir="jd2/install/JDownloader 2"
-	elif [ -d "jd2/install/JDownloader2" ]; then
-		src_dir="jd2/install/JDownloader2"
-	else
-		src_dir="jd2/install"
-	fi
-	cp -a "$src_dir"/. jd2/
-	rm -rf jd2/install
+if [ -d "$INSTALL_DIR" ]; then
+	src_dir="$INSTALL_DIR"
+elif [ -d "${INSTALL_WORKDIR}/JDownloader 2" ]; then
+	src_dir="${INSTALL_WORKDIR}/JDownloader 2"
+elif [ -d "${INSTALL_WORKDIR}/JDownloader2" ]; then
+	src_dir="${INSTALL_WORKDIR}/JDownloader2"
+else
+	src_dir="$INSTALL_WORKDIR"
 fi
+
+if [ -n "$src_dir" ] && [ -d "$src_dir" ]; then
+	cp -a "$src_dir"/. jd2/
+fi
+rm -rf "$INSTALL_WORKDIR"
 
 # Préparation AppDir
 mkdir -p AppDir/bin AppDir/jd2
