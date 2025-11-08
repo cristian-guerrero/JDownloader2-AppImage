@@ -10,7 +10,7 @@ UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest
 
 # Téléchargement OpenJDK
 mkdir -p jd2/jre
-wget -O OpenJDK.tar.gz https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz
+wget -O OpenJDK.tar.gz https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.11%2B9/OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz
 tar -xzf OpenJDK.tar.gz --strip-components=1 -C jd2/jre
 
 # Téléchargement JDownloader2
