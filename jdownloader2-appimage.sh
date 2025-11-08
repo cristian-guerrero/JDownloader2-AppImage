@@ -5,7 +5,8 @@ set -e
 ARCH="$(uname -m)"
 PACKAGE="JDownloader2"
 DATE="$(date +'%Y%m%d')"
-OUTNAME="$PACKAGE-$DATE-$ARCH.AppImage"
+DATE_HUMAN="$(date +'%y.%m.%d')"
+OUTNAME="$PACKAGE-$DATE_HUMAN-$ARCH.AppImage"
 UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 
 ensure_python3() {
@@ -107,11 +108,11 @@ chmod +x quick-sharun.sh
 export UPINFO
 export OUTNAME
 export STARTUPWMCLASS=JDownloader2
-export VERSION="$DATE"
+export VERSION="$DATE_HUMAN"
 ./quick-sharun.sh --make-appimage
 
 # Préparation pour release
 mkdir -p dist
 mv -v ./*.AppImage* dist/
-echo "$DATE" > dist/version
+echo "$PACKAGE $DATE_HUMAN" > dist/version
 
