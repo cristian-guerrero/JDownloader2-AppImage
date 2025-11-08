@@ -35,5 +35,7 @@ wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-
 chmod +x quick-sharun.sh
 STARTUPWMCLASS=JDownloader2 VERSION=${VERSION:-dev} ./quick-sharun.sh --make-appimage
 mkdir -p dist
+
 mv JDownloader_2-*-x86_64.AppImage dist/
+mv JDownloader_2-*-x86_64.AppImage.zsync dist/ 2>/dev/null || true
 
