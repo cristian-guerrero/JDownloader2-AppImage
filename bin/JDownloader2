@@ -34,6 +34,7 @@ fi
 
 printf '%s\n' "$CURRENT_STAMP" > "$STAMP_FILE"
 
+export JAVA_HOME="$BUNDLE_ROOT/jd2/jre"
 cd "$PERSIST_DIR"
 exec "$PERSIST_DIR/JDownloader2" "$@"
 exit "$?"
