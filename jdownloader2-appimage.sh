@@ -33,7 +33,7 @@ chmod +x AppDir/AppRun
 # Construction AppImage
 wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/quick-sharun.sh
 chmod +x quick-sharun.sh
-VERSION=${VERSION:-dev} ./quick-sharun.sh --make-appimage
+STARTUPWMCLASS=JDownloader2 VERSION=${VERSION:-dev} ./quick-sharun.sh --make-appimage
 mkdir -p dist
 mv JDownloader_2-*-x86_64.AppImage dist/
 
