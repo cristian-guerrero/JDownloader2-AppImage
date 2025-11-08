@@ -84,7 +84,8 @@ adjust_nofile_limit() {
       fi
     fi
 
-    # Essayez l'option POSIX (-S -n), retombez sur la forme simple si nécessaire.
+    # Fixe d'abord la hard limit si possible, puis la soft limit.
+    ulimit -H -n "$new_limit" 2>/dev/null || true
     ulimit -S -n "$new_limit" 2>/dev/null || ulimit -n "$new_limit" 2>/dev/null || true
   fi
 }
