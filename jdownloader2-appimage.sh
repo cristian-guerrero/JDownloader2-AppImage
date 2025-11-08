@@ -84,28 +84,37 @@ patched = patched.replace(
 launcher.write_text(patched)
 PY
 
-# Préparation AppDir
-rm -rf AppDir
-mkdir -p AppDir/bin AppDir/jd2
-cp jd2/JDownloader2 AppDir/jd2/JDownloader2
-cp -a jd2/. AppDir/jd2/
-# Récupération dynamique du .desktop et de l'icône
-cp "jd2/JDownloader 2.desktop" AppDir/JDownloader2.desktop
-cp "jd2/.install4j/JDownloader2.png" AppDir/.DirIcon
-cp bin/JDownloader2 AppDir/bin/JDownloader2
-# S'assurer que le lanceur est exécutable
-chmod +x AppDir/bin/JDownloader2
-# Récupérer l'AppRun générique fourni par quick-sharun
-wget -O AppDir/AppRun https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/bin/AppRun-generic
-sed -i \
-	-e "s|@MAIN_BIN@|JDownloader2|" \
-	-e "s|@APPIMAGE_ARCH@|$ARCH|" \
-	AppDir/AppRun
-chmod +x AppDir/AppRun
-
-# Construction AppImage
+# Récupération de quick-sharun / sharun runtime
 wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/quick-sharun.sh
 chmod +x quick-sharun.sh
+
+# Préparation AppDir via quick-sharun pour injecter AppRun/sharun
+rm -rf AppDir
+
+DESKTOP_SRC="jd2/JDownloader 2.desktop"
+DESKTOP_TMP="$PWD/JDownloader2.desktop"
+cp "$DESKTOP_SRC" "$DESKTOP_TMP"
+sed -i 's|^Exec=.*|Exec=JDownloader2|' "$DESKTOP_TMP"
+
+ICON_PATH="$PWD/jd2/.install4j/JDownloader2.png"
+chmod +x bin/JDownloader2
+
+APPDIR="$PWD/AppDir" \
+DESKTOP="$DESKTOP_TMP" \
+ICON="$ICON_PATH" \
+ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" \
+./quick-sharun.sh "$PWD/bin/JDownloader2"
+
+# Injecter les fichiers JDownloader dans l'AppDir générée
+mkdir -p AppDir/jd2 AppDir/bin
+cp -a jd2/. AppDir/jd2/
+cp bin/JDownloader2 AppDir/bin/JDownloader2
+chmod +x AppDir/bin/JDownloader2
+cp "$DESKTOP_TMP" AppDir/JDownloader2.desktop
+cp "$ICON_PATH" AppDir/.DirIcon
+rm -f "$DESKTOP_TMP"
+
+# Construction AppImage
 export UPINFO
 export OUTNAME
 export STARTUPWMCLASS=JDownloader2
