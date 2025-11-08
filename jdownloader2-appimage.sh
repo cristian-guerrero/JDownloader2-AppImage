@@ -88,8 +88,13 @@ PY
 wget -O quick-sharun.sh https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/main/useful-tools/quick-sharun.sh
 chmod +x quick-sharun.sh
 
-# Préparation AppDir via quick-sharun pour injecter AppRun/sharun
+# Préparer AppDir et y placer JDownloader avant l'exécution de quick-sharun
 rm -rf AppDir
+mkdir -p AppDir/jd2 AppDir/bin AppDir/shared/bin
+cp -a jd2/. AppDir/jd2/
+install -m 755 bin/JDownloader2 AppDir/bin/JDownloader2
+
+# Préparation AppDir via quick-sharun pour injecter AppRun/sharun
 
 DESKTOP_SRC="jd2/JDownloader 2.desktop"
 DESKTOP_TMP="$PWD/JDownloader2.desktop"
@@ -103,13 +108,19 @@ APPDIR="$PWD/AppDir" \
 DESKTOP="$DESKTOP_TMP" \
 ICON="$ICON_PATH" \
 ADD_HOOKS="self-updater.bg.hook:fix-namespaces.hook" \
+DEPLOY_DATADIR=0 \
+DEPLOY_LOCALE=0 \
+JD2_APPIMAGE_BUILD=1 \
 ./quick-sharun.sh "$PWD/bin/JDownloader2"
 
+# quick-sharun/URuntime déploie lui-même le lanceur et l'environnement
+# nécessaires (runtime sans FUSE) : inutile de télécharger un sharun séparé.
+
+# Nettoyer les copies persistantes capturées par strace lors du déploiement
+rm -rf AppDir/shared/lib/home
+
 # Injecter les fichiers JDownloader dans l'AppDir générée
-mkdir -p AppDir/jd2 AppDir/bin
-cp -a jd2/. AppDir/jd2/
-cp bin/JDownloader2 AppDir/bin/JDownloader2
-chmod +x AppDir/bin/JDownloader2
+install -m 755 bin/JDownloader2 AppDir/shared/bin/JDownloader2
 cp "$DESKTOP_TMP" AppDir/JDownloader2.desktop
 cp "$ICON_PATH" AppDir/.DirIcon
 rm -f "$DESKTOP_TMP"
