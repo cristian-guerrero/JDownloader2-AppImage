@@ -52,6 +52,26 @@ printf '%s\n' "$CURRENT_STAMP" > "$STAMP_FILE"
 
 export JAVA_HOME="$BUNDLE_ROOT/jd2/jre"
 export INSTALL4J_JAVA_HOME="$BUNDLE_ROOT/jd2/jre"
+
+adjust_nofile_limit() {
+  current_limit=$(ulimit -n 2>/dev/null || printf '')
+  case "$current_limit" in
+    '' ) return ;;
+    unlimited )
+      ulimit -n 1048576 2>/dev/null || true
+      return
+      ;;
+  esac
+
+  if printf '%s\n' "$current_limit" | grep -Eq '^[0-9]+$'; then
+    if [ "$current_limit" -gt 1048576 ]; then
+      ulimit -n 1048576 2>/dev/null || true
+    fi
+  fi
+}
+
+adjust_nofile_limit
+
 cd "$PERSIST_DIR"
 exec "$PERSIST_DIR/JDownloader2" "$@"
 exit "$?"
