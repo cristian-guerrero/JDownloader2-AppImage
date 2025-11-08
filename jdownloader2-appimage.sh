@@ -8,6 +8,46 @@ DATE="$(date +'%Y%m%d')"
 OUTNAME="$PACKAGE-$DATE-$ARCH.AppImage"
 UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 
+ensure_python3() {
+	if command -v python3 >/dev/null 2>&1; then
+		return
+	fi
+
+	echo "python3 not found; attempting to install it..." >&2
+
+	install_cmd() {
+		if [ "$(id -u)" -eq 0 ]; then
+			"$@"
+		elif command -v sudo >/dev/null 2>&1; then
+			sudo "$@"
+		else
+			echo "Cannot install python3 automatically (need root privileges)." >&2
+			return 1
+		fi
+	}
+
+	if command -v pacman >/dev/null 2>&1; then
+		install_cmd pacman -Sy --noconfirm --needed python
+	elif command -v apt-get >/dev/null 2>&1; then
+		install_cmd apt-get update
+		install_cmd apt-get install -y python3
+	elif command -v dnf >/dev/null 2>&1; then
+		install_cmd dnf install -y python3
+	elif command -v zypper >/dev/null 2>&1; then
+		install_cmd zypper --non-interactive install python3
+	elif command -v apk >/dev/null 2>&1; then
+		install_cmd apk add --no-cache python3
+	else
+		echo "Unsupported package manager; please install python3 manually." >&2
+		return 1
+	fi
+
+	if ! command -v python3 >/dev/null 2>&1; then
+		echo "python3 installation failed." >&2
+		return 1
+	fi
+}
+
 # Téléchargement OpenJDK
 mkdir -p jd2/jre
 wget -O OpenJDK.tar.gz https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz
@@ -16,6 +56,7 @@ tar -xzf OpenJDK.tar.gz --strip-components=1 -C jd2/jre
 # Téléchargement JDownloader2
 mkdir -p jd2
 wget -O JD2Setup_x64.sh https://installer.jdownloader.org/JD2Setup_x64.sh
+ensure_python3
 INSTALL4J_JAVA_HOME="$PWD/jd2/jre" xvfb-run -a bash JD2Setup_x64.sh -q -dir "${PWD}/jd2"
 
 # Patch du lanceur install4j pour supporter les JVM récentes (>= 9)
