@@ -48,4 +48,12 @@ chmod +x ./quick-sharun
 
 ./quick-sharun "$APPDIR/JDownloader2"
 
-echo "AppImage JDownloader2 généré : $OUTNAME"
+if [ ! -f "$OUTNAME" ]; then
+	echo "Erreur : l'AppImage attendue $OUTNAME est introuvable." >&2
+	exit 3
+fi
+
+mkdir -p dist
+mv -f "$OUTNAME" "dist/$OUTNAME"
+
+echo "AppImage JDownloader2 généré : dist/$OUTNAME"
