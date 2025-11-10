@@ -100,7 +100,15 @@ if [ -n "$JAVA_BIN" ]; then
   fi
 
   JAVA_PREFIX=$(cd "$(dirname "$JAVA_REAL")/.." 2>/dev/null || printf '')
-  if [ -n "$JAVA_PREFIX" ]; then
+  JAVA_MODULE_LIST=$("$JAVA_BIN" --list-modules 2>/dev/null || true)
+  if [ -n "$JAVA_MODULE_LIST" ]; then
+    if ! printf '%s\n' "$JAVA_MODULE_LIST" | grep -q '^java.desktop@'; then
+      JAVA_IS_HEADLESS=1
+    fi
+  fi
+  unset JAVA_MODULE_LIST
+
+  if [ "$JAVA_IS_HEADLESS" = 0 ] && [ -n "$JAVA_PREFIX" ]; then
     if [ ! -e "$JAVA_PREFIX/lib/libawt_xawt.so" ] && [ ! -e "$JAVA_PREFIX/lib/libawt.so" ]; then
       JAVA_IS_HEADLESS=1
     fi
