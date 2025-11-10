@@ -77,8 +77,8 @@ fi
 
 JRE_LOCAL="$PERSIST_DIR/jre"
 JAVA_BIN=""
-JAVA_PREFIX=""
 JAVA_IS_HEADLESS=0
+JAVA_HEADLESS_CANDIDATE=""
 
 declare -a JAVA_CANDIDATES=()
 declare -A JAVA_SEEN=()
@@ -105,9 +105,6 @@ if command -v java >/dev/null 2>&1; then
   unset PATH_JAVA_LIST
 fi
 
-JAVA_FIRST_HEADLESS=""
-JAVA_FIRST_HEADLESS_PREFIX=""
-
 for candidate in "${JAVA_CANDIDATES[@]}"; do
   CANDIDATE_HEADLESS=0
   if command -v readlink >/dev/null 2>&1; then
@@ -119,6 +116,10 @@ for candidate in "${JAVA_CANDIDATES[@]}"; do
   fi
 
   CANDIDATE_PREFIX=$(cd "$(dirname "$CANDIDATE_REAL")/.." 2>/dev/null && pwd || printf '')
+  if [ -z "$CANDIDATE_PREFIX" ] || [ "$CANDIDATE_PREFIX" = "/" ]; then
+    CANDIDATE_PREFIX=""
+  fi
+
   CANDIDATE_MODULE_LIST=$("$candidate" --list-modules 2>/dev/null || true)
   if [ -n "$CANDIDATE_MODULE_LIST" ]; then
     if ! printf '%s\n' "$CANDIDATE_MODULE_LIST" | grep -q '^java.desktop@'; then
@@ -128,21 +129,19 @@ for candidate in "${JAVA_CANDIDATES[@]}"; do
   unset CANDIDATE_MODULE_LIST
 
   if [ "$CANDIDATE_HEADLESS" = 0 ] && [ -n "$CANDIDATE_PREFIX" ]; then
-    if [ ! -e "$CANDIDATE_PREFIX/lib/libawt_xawt.so" ] || [ ! -e "$CANDIDATE_PREFIX/lib/libfontmanager.so" ]; then
+    if ! find "$CANDIDATE_PREFIX" -maxdepth 3 -type f \( -name 'libawt_xawt.so' -o -name 'libawt_xawt.dylib' \) -print -quit >/dev/null; then
       CANDIDATE_HEADLESS=1
     fi
   fi
 
   if [ "$CANDIDATE_HEADLESS" = 0 ]; then
     JAVA_BIN="$candidate"
-    JAVA_PREFIX="$CANDIDATE_PREFIX"
     JAVA_IS_HEADLESS=0
     break
   fi
 
-  if [ -z "$JAVA_FIRST_HEADLESS" ]; then
-    JAVA_FIRST_HEADLESS="$candidate"
-    JAVA_FIRST_HEADLESS_PREFIX="$CANDIDATE_PREFIX"
+  if [ -z "$JAVA_HEADLESS_CANDIDATE" ]; then
+    JAVA_HEADLESS_CANDIDATE="$candidate"
   fi
 done
 
@@ -150,23 +149,18 @@ unset CANDIDATE_HEADLESS
 unset CANDIDATE_REAL
 unset CANDIDATE_PREFIX
 
-if [ -z "$JAVA_BIN" ] && [ -n "$JAVA_FIRST_HEADLESS" ]; then
-  JAVA_BIN="$JAVA_FIRST_HEADLESS"
-  JAVA_PREFIX="$JAVA_FIRST_HEADLESS_PREFIX"
+if [ -z "$JAVA_BIN" ] && [ -n "$JAVA_HEADLESS_CANDIDATE" ]; then
   JAVA_IS_HEADLESS=1
 fi
 
-unset JAVA_FIRST_HEADLESS
-unset JAVA_FIRST_HEADLESS_PREFIX
 unset JAVA_CANDIDATES
 unset JAVA_SEEN
 
 if [ "$JAVA_IS_HEADLESS" = 1 ]; then
   if [ "${JD2_APPIMAGE_SKIP_JRE_FETCH:-}" = "1" ]; then
-    printf 'Avertissement : JVM headless détectée (%s). Certaines fonctionnalités GUI peuvent échouer.\n' "$JAVA_BIN" >&2
+    printf 'Avertissement : JVM headless détectée (%s). Certaines fonctionnalités GUI peuvent échouer.\n' "$JAVA_HEADLESS_CANDIDATE" >&2
   else
-    printf "JVM headless détectée (%s). Téléchargement d'un JRE complet Temurin 25 local.\n" "$JAVA_BIN" >&2
-    JAVA_BIN=""
+    printf "JVM headless détectée (%s). Téléchargement d'un JRE complet Temurin 25 local.\n" "$JAVA_HEADLESS_CANDIDATE" >&2
   fi
 fi
 
@@ -188,7 +182,7 @@ if [ -z "$JAVA_BIN" ]; then
     fi
 
     if [ -z "$JRE_URL" ] || [ "$JRE_URL" = "null" ]; then
-      JRE_URL="https://github.com/adoptium/temurin25-binaries/releases/latest/download/OpenJDK25U-jre_x64_linux_hotspot.tar.gz"
+      JRE_URL="https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jre_x64_linux_hotspot_25.0.1_8.tar.gz"
     fi
   else
     JRE_URL="$JD2_APPIMAGE_JRE_URL"
