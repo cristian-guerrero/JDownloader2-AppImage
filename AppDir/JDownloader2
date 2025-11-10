@@ -93,9 +93,70 @@ add_java_candidate() {
   fi
 }
 
-add_java_candidate "$JRE_LOCAL/bin/java"
-add_java_candidate "${INSTALL4J_JAVA_HOME:-}/bin/java"
-add_java_candidate "${JAVA_HOME:-}/bin/java"
+add_java_dir_candidate() {
+  local dir="${1%/}"
+  if [ -n "$dir" ] && [ "$dir" != "/" ]; then
+    add_java_candidate "$dir/bin/java"
+  fi
+}
+
+add_java_glob_candidates() {
+  local pattern
+  local entry
+  local oldifs="$IFS"
+  shopt -s nullglob
+  IFS=$'\n'
+  for pattern in "$@"; do
+    for entry in $pattern; do
+      if [ -d "$entry" ]; then
+        add_java_dir_candidate "$entry"
+      fi
+    done
+  done
+  IFS="$oldifs"
+  shopt -u nullglob
+}
+
+add_java_dir_from_file() {
+  local cfg="$1"
+  local line
+  if [ -f "$cfg" ]; then
+    if IFS= read -r line < "$cfg"; then
+      add_java_dir_candidate "$line"
+    fi
+  fi
+}
+
+declare -a JAVA_KNOWN_PREFIX_PATTERNS=(
+  "/usr/lib/jvm/*"
+  "/usr/lib/java*"
+  "/usr/lib/jdk*"
+  "/usr/lib/jre*"
+  "/usr/lib/j2*re*"
+  "/usr/lib/j2sdk*"
+  "/usr/java*"
+  "/usr/java*/jre"
+  "/usr/java/j2*re*"
+  "/usr/java/j2sdk*"
+  "/usr/jdk*"
+  "/usr/jre*"
+  "/usr/j2*re*"
+  "/usr/j2sdk*"
+  "/usr/local/java*"
+  "/usr/local/jdk*"
+  "/usr/local/jre*"
+  "/opt/java*"
+  "/opt/jdk*"
+  "/opt/jre*"
+  "/Library/Java/JavaVirtualMachines/*.jdk/Contents/Home"
+  "/Library/Java/JavaVirtualMachines/*.jre/Contents/Home"
+  "/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home"
+  "/System/Library/Frameworks/JavaVM.framework/Versions/*/Home"
+)
+
+add_java_dir_candidate "${JAVA_HOME:-}"
+add_java_dir_candidate "${JDK_HOME:-}"
+add_java_dir_candidate "${JRE_HOME:-}"
 
 if command -v java >/dev/null 2>&1; then
   PATH_JAVA_LIST=$(command -v -a java 2>/dev/null || printf '')
@@ -104,6 +165,18 @@ if command -v java >/dev/null 2>&1; then
   done <<< "$PATH_JAVA_LIST"
   unset PATH_JAVA_LIST
 fi
+
+if [ -n "${JD2_APPIMAGE_EXTRA_JAVA_DIRS:-}" ]; then
+  while IFS= read -r extra_dir; do
+    add_java_dir_candidate "$extra_dir"
+  done <<EOF
+$(printf '%s\n' "${JD2_APPIMAGE_EXTRA_JAVA_DIRS}" | tr ':' '\n')
+EOF
+fi
+
+add_java_glob_candidates "${JAVA_KNOWN_PREFIX_PATTERNS[@]}"
+
+add_java_candidate "$JRE_LOCAL/bin/java"
 
 for candidate in "${JAVA_CANDIDATES[@]}"; do
   CANDIDATE_HEADLESS=0
@@ -163,6 +236,12 @@ if [ "$JAVA_IS_HEADLESS" = 1 ]; then
     printf 'Avertissement : JVM headless détectée (%s). Certaines fonctionnalités GUI peuvent échouer.\n' "$JAVA_HEADLESS_CANDIDATE" >&2
   else
     printf "JVM headless détectée (%s). Téléchargement d'un JRE complet Temurin 25 local.\n" "$JAVA_HEADLESS_CANDIDATE" >&2
+  fi
+fi
+
+if [ -n "$JAVA_BIN" ] && [ "${JAVA_BIN#$JRE_LOCAL/}" = "$JAVA_BIN" ]; then
+  if [ -d "$JRE_LOCAL" ]; then
+    rm -rf "$JRE_LOCAL"
   fi
 fi
 
