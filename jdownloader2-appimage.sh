@@ -55,7 +55,7 @@ export OUTPUT_APPIMAGE=1
 mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME"
 
 cleanup() {
-	rm -rf "$JD2_APPIMAGE_DATA_DIR" "$XDG_DATA_HOME" "$XDG_CONFIG_HOME"
+	rm -rf "$XDG_DATA_HOME" "$XDG_CONFIG_HOME"
 }
 trap cleanup EXIT
 
