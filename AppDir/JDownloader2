@@ -29,10 +29,10 @@ fi
 
 DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 if [ "${JD2_APPIMAGE_BUILD:-}" = "1" ]; then
-  PERSIST_DIR="$DATA_HOME/JDownloader2"
-else
-  PERSIST_DIR="${JD2_APPIMAGE_DATA_DIR:-$DATA_HOME/JDownloader2}"
+  # Pas d'initialisation du profil pendant le build
+  exit 0
 fi
+PERSIST_DIR="${JD2_APPIMAGE_DATA_DIR:-$DATA_HOME/JDownloader2}"
 STAMP_FILE="$PERSIST_DIR/.appimage-source"
 STAMP_SOURCE="$APP_BUNDLE_ROOT/JDownloader.jar"
 
