@@ -22,4 +22,3 @@ chmod +x ./quick-sharun
 # Prepare the AppImage for release
 mkdir -p ./dist
 mv -v ./*.AppImage* ./dist
-mv -v ~/version     ./dist
