@@ -29,6 +29,6 @@ echo "---------------------------------------------------------------"
 
 JRE_URL=$(wget -qO- --retry-connrefused --tries=30 "$JRE_API_URL" | jq -r '.[0].binary.package.link')
 
-wget --retry-connrefused --tries=30 "$JDOWNLOADER_JAR" -0 ./JDownloader.jar
+wget --retry-connrefused --tries=30 "$JDOWNLOADER_JAR" -O ./JDownloader.jar
 wget --retry-connrefused --tries=30 "$JRE_URL" -O ./jre.tar.gz 
 
