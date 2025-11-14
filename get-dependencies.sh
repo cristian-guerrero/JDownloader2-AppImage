@@ -15,7 +15,7 @@ pacman -Syu --noconfirm \
 	libxtst \
 	wget \
 	xorg-server-xvfb \
-	zsync
+	zsync \
     p7zip \
     gzip \
     which \
