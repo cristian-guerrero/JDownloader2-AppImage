@@ -49,7 +49,6 @@ ln -sf ../../JDownloader2 "$APPDIR/shared/bin/JDownloader2"
 export OUTNAME
 export JD2_APPIMAGE_BUILD=1
 export JD2_APPIMAGE_BUNDLE_DIR="$APPDIR"
-
 export XDG_DATA_HOME="$APPDIR/.xdg-data"
 export XDG_CONFIG_HOME="$APPDIR/.xdg-config"
 export OUTPUT_APPIMAGE=1
