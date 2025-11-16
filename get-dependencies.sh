@@ -11,16 +11,11 @@ echo "---------------------------------------------------------------"
 
 pacman -Syu --noconfirm \
 	base-devel \
-	curl \
 	desktop-file-utils \
 	git \
 	libxtst \
 	wget \
-	xorg-server-xvfb \
 	zsync \
-    p7zip \
-    gzip \
-    which \
     jq
    
 
