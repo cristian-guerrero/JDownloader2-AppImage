@@ -3,13 +3,13 @@
 set -eux
 
 ARCH="$(uname -m)"
-VERSION=$(pacman -Q JDownloader2 | awk '{print $2; exit}') # example command to get version of application here
+VERSION="$(date +'%y.%m.%d')"
 export ARCH VERSION
 export OUTPATH=./dist
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 
 # Deploy dependencies
-quick-sharun /AppDir/bin/JDownloader2
+quick-sharun /AppDir/bin/JDownloader2 /AppDir/JDownloader.jar /AppDir/jre.tar.gz
 
 # Make the AppImage with uruntime
 quick-sharun --make-appimage
