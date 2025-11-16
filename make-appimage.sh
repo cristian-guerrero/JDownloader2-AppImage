@@ -9,7 +9,7 @@ export OUTPATH=./dist
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 
 # Deploy dependencies
-quick-sharun /AppDir/bin/JDownloader2 /AppDir/JDownloader.jar /AppDir/jre.tar.gz
+quick-sharun /AppDir/bin/JDownloader2
 
 # Make the AppImage with uruntime
 quick-sharun --make-appimage
