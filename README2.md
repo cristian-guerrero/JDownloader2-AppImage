@@ -1,3 +1,18 @@
+TEMPLATE-AppImage 🐧
+
+GitHub Downloads CI Build Status
+
+    Latest Stable Release
+
+AppImage made using sharun, which makes it extremely easy to turn any binary into a portable package without using containers or similar tricks.
+
+This AppImage bundles everything and should work on any linux distro, even on musl based ones.
+
+This AppImage can work without FUSE at all thanks to the uruntime
+
+More at: AnyLinux-AppImages
+raison d'être
+Inspiration Image
 
 # Unofficial JDownloader2 AppImage
 
