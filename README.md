@@ -13,9 +13,10 @@
 
 ---
 
+
 AppImage made using [sharun](https://github.com/VHSgunzo/sharun), which makes it extremely easy to turn any binary into a portable package without using containers or similar tricks.
 
-**This AppImage bundles everything and should work on any linux distro, even on musl based ones.**
+**JDownloader requires Java to run. This AppImage includes a bundled JRE for convenience, but if your system is too old or uses musl (like Alpine Linux), you may need to install the latest OpenJDK package from your distribution's package manager for proper functionality.**
 
 This AppImage can work **without FUSE** at all thanks to the [uruntime](https://github.com/VHSgunzo/uruntime)
 
