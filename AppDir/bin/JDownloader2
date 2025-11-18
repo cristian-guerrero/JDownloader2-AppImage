@@ -362,6 +362,27 @@ if [[ $JD2_JAVA_MAJOR =~ ^[0-9]+$ ]] && [[ $JD2_JAVA_VERSION != 1.* ]] && (( JD2
     '--add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED'
   )
 fi
+
 # <<< JD2 AppImage JVM options block <<<
+
+
+# Vérification du JRE embarqué si aucune JVM système n'a été trouvée
+if [ "$JAVA_BIN" = "$JRE_LOCAL/bin/java" ]; then
+  if ! "$JAVA_BIN" -version >/dev/null 2>&1; then
+    MSG="The bundled JRE could not start.\nPlease install the latest OpenJDK from your package manager."
+    if command -v zenity >/dev/null 2>&1; then
+      zenity --error --title="JDownloader2" --text="$MSG"
+    elif command -v kdialog >/dev/null 2>&1; then
+      kdialog --error "$MSG" --title "JDownloader2"
+    elif command -v yad >/dev/null 2>&1; then
+      yad --text="$MSG" --title="JDownloader2" --button=OK --width=400 --height=100 --center --window-icon=error
+    elif command -v xmessage >/dev/null 2>&1; then
+      xmessage -center "$MSG"
+    else
+      echo "$MSG"
+    fi
+    exit 1
+  fi
+fi
 
 exec "$JAVA_BIN" "${JD2_JAVA_OPTS[@]}" -jar JDownloader.jar "$@"
