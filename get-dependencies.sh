@@ -4,7 +4,7 @@ set -eux
 
 ARCH="$(uname -m)"
 
-echo "Installing build dependencies for sharun & AppImage integration..."
+echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
 
 pacman -Syu --noconfirm \
@@ -14,22 +14,22 @@ pacman -Syu --noconfirm \
 	libxtst \
 	wget \
 	zsync \
-    jq
+    jq \
+	jre-openjdk
    
 
-echo "Installing the app & it's dependencies..."
+echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
+get-debloated-pkgs --add-common --prefer-nano
 
-JDOWNLOADER_JAR="https://installer.jdownloader.org/JDownloader.jar"
+# Comment this out if you need an AUR package
+#make-aur-package PACKAGENAME
 
-if [ "$ARCH" = "x86_64" ]; then
-	JRE_API_URL="https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=x64&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=linux&vendor=adoptium"
-elif [ "$ARCH" = "aarch64" ]; then
-	JRE_API_URL="https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=aarch64&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=linux&vendor=adoptium"
-fi
 
-JRE_URL=$(wget -qO- --retry-connrefused --tries=30 "$JRE_API_URL" | jq -r '.[0].binary.package.link')
+# If the application needs to be manually built that has to be done down here
 
-wget --retry-connrefused --tries=30 "$JDOWNLOADER_JAR" -O ./AppDir/JDownloader.jar
-wget --retry-connrefused --tries=30 "$JRE_URL" -O ./AppDir/jre.tar.gz 
+chmod +x ./JDownloader2Setup_unix_nojre.sh
+./JDownloader2Setup_unix_nojre.sh
 
+#mkdir -p ./AppDir/bin
+cp -rv "$HOME/jd2"/* ./AppDir/bin/

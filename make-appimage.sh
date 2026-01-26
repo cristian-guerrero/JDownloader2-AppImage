@@ -7,10 +7,12 @@ VERSION="$(date +'%y.%m.%d')"
 export ARCH VERSION
 export OUTPATH=./dist
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export JD2_APPIMAGE_BUILD=1
+
 
 # Deploy dependencies
-quick-sharun ./AppDir/bin/JDownloader2
+quick-sharun \
+        ./AppDir/bin/* \
+        /usr/lib/jvm/java-25-openjdk/*
 
 # Make the AppImage with uruntime
 quick-sharun --make-appimage
