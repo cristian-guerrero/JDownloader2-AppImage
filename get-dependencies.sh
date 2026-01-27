@@ -16,9 +16,7 @@ pacman -Syu --noconfirm \
 	zsync \
     jq \
 	jre-openjdk
-	
-    
-
+	  
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
 get-debloated-pkgs --add-common --prefer-nano

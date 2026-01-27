@@ -2,7 +2,6 @@
 
 JDDIR="$HOME/.local/share/JDownloader2"
 
-# Test simple : le .jar existe et n'est pas vide
 if [ ! -s "$JDDIR/JDownloader.jar" ]; then
     rm -rf "$JDDIR/JDownloader.jar" "$JDDIR/Core.jar" "$JDDIR/update" "$JDDIR/tmp" 2>/dev/null
     mkdir -p "$JDDIR"

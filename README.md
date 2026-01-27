@@ -17,9 +17,9 @@
 
 AppImage made using sharun, which makes it extremely easy to turn any binary into a portable package without using containers or similar tricks.
 
-This AppImage bundles everything and should work on any linux distro, even on musl based ones.
+**This AppImage bundles everything and should work on any linux distro, even on musl based ones.**
 
-This AppImage can work without FUSE at all thanks to the uruntime
+This AppImage can work **without FUSE** at all thanks to the [uruntime](https://github.com/VHSgunzo/uruntime)
 
 I recommend using AM:
 
