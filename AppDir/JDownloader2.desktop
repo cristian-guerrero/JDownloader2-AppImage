@@ -1,8 +1,7 @@
-#!/usr/bin/env xdg-open
 [Desktop Entry]
 Type=Application
 Name=JDownloader2
-Exec=JDownloader2 %U
+Exec=JDownloader2.sh %U
 Icon=jdownloader2
-Categories=Network;Application;
+Categories=Network;Downloader;FileTransfer;Utility;
 StartupWMClass=org-jdownloader-update-launcher-JDLauncher
