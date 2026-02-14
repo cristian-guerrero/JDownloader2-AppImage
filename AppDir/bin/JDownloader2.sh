@@ -28,8 +28,9 @@ if [ ! -s "$JDDIR/JDownloader.jar" ]; then
     sleep 1
 fi
 
-# copie icone systray
-install -m644 "$(dirname "$0")/jd_logo_128_128.png" \
-  "$LOGODIR/jd_logo_128_128.png"
+# copie icone systray if gnome
+if pgrep -x gnome-shell >/dev/null 2>&1 || [ "${XDG_CURRENT_DESKTOP:-}" = "GNOME" ] || [ "${DESKTOP_SESSION:-}" = "gnome" ]; then
+  install -m644 "$(dirname "$0")/jd_logo_128_128.png" "$LOGODIR/jd_logo_128_128.png"
+fi
 
 exec java -jar "$JDDIR/JDownloader.jar" "$@"
