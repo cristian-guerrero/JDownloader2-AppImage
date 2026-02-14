@@ -22,10 +22,16 @@ if [ ! -s "$JDDIR/JDownloader.jar" ]; then
         i=$((i+1))
     done
 
-    # arrêter ce 1er run
+    # arrêter ce 1er run (sans tuer le script launcher)
     kill "$PID" 2>/dev/null || true
-    pkill -f 'JDownloader.jar|jdownloader2' >/dev/null 2>&1 || true
-    sleep 1
+    pgrep -f "java .*${JDDIR}/JDownloader.jar" | xargs -r kill 2>/dev/null || true
+
+    # attendre l'arrêt complet des process JD (max 20s)
+    i=0
+    while pgrep -f "java .*${JDDIR}/JDownloader.jar" >/dev/null 2>&1 && [ $i -lt 20 ]; do
+        sleep 1
+        i=$((i+1))
+    done
 fi
 
 # copie icone systray if gnome
